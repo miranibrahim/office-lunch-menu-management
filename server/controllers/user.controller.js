@@ -37,7 +37,7 @@ exports.saveUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const email = req.params.email;
-  const role = req.body.role;
+  const {role} = req.body;
 
   try {
     const result = await pool.query(
