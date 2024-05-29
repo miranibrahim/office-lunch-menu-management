@@ -1,10 +1,11 @@
 const express = require("express");
-const { getMenu, saveMenu, updateMenu, deleteMenu } = require("../controllers/menu.controller");
+const { saveMenu, updateMenu, deleteMenu, getAllMenu, getSearchedMenu } = require("../controllers/menu.controller");
 const menuRouter = express.Router();
 
 
 
-menuRouter.get("/menus", getMenu);
+// menuRouter.get("/menus", getAllMenu);
+menuRouter.get("/menus", getSearchedMenu);
 menuRouter.post("/menus", saveMenu);
 menuRouter.patch("/menus/:date", updateMenu);
 menuRouter.delete("/menus/:date", deleteMenu);

@@ -2,7 +2,6 @@ const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const pool = require("../db/db");
 
-
 exports.getUser = async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users");
@@ -13,8 +12,20 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getSingleUser = async (req, res) => {
+  try {
+    const {email} = req.params;
+    const result = await pool.query("SELECT role FROM users where  email = $1", [email]);
+    res.status(200).json({ message: "User role returned.", data: result.rows });
+  } catch (error) {
+    console.error("Error retrieving users role:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 exports.saveUser = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { emp_id, username, email, password, role } = req.body;
+  console.log(req.body);
   const id = uuidv4();
 
   try {
@@ -24,20 +35,22 @@ exports.saveUser = async (req, res) => {
 
     // Saving with the hashed password
     const result = await pool.query(
-      "INSERT INTO users (u_id, name, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [id, username, email, hashedPassword, role]
+      "INSERT INTO users (u_id, emp_id, name, email, password, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [id, emp_id, username, email, hashedPassword, role]
     );
 
-    res.status(201).json({ message: "User created.", data: result.rows });
+    res
+      .status(201)
+      .json({ message: "User created.", data: result.rows, inserted: true });
   } catch (error) {
     console.error("Error saving user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error", inserted: false });
   }
 };
 
 exports.updateUser = async (req, res) => {
   const email = req.params.email;
-  const {role} = req.body;
+  const { role } = req.body;
 
   try {
     const result = await pool.query(

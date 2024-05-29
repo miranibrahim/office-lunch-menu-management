@@ -3,6 +3,7 @@ CREATE DATABASE lunchDB;
 ---------  User Table created---------
 CREATE TABLE users (
     u_id VARCHAR(255) PRIMARY KEY,
+    emp_id VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -10,10 +11,11 @@ CREATE TABLE users (
 );
 
 -- -----------insert user-----------------
-INSERT INTO users (u_id, name, email, password, role)
+INSERT INTO users (u_id, emp_id, name, email, password, role)
 VALUES
     (
         'unique_user_id_123',
+        'e-101',
         'John Doe',
         'john.doe@example.com',
         'hashed_password_here',
@@ -50,3 +52,8 @@ WHERE date = '2024-05-28';
 -- -------Delete Menu------------
 DELETE FROM menus WHERE date= '2024-05-28';
 
+-- --------Searched Menu---------------
+SELECT date, menu
+      FROM menu
+      WHERE date BETWEEN $1 AND $2
+      ORDER BY date;
