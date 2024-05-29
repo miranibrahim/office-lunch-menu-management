@@ -1,8 +1,17 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useContext, useState } from "react";
+import { NavLink, Navigate } from "react-router-dom";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logOut } = useContext(AuthContext);
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        Navigate("/");
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
     <nav className="bg-black bg-opacity-35 w-full p-4 fixed">
@@ -15,12 +24,30 @@ const Navbar = () => {
           <NavLink to="/">
             <button className="text-white">Home</button>
           </NavLink>
-          <NavLink to="/login">
-            <button className="text-white">Login</button>
-          </NavLink>
-          <NavLink to="/register">
-            <button className="text-white">Register</button>
-          </NavLink>
+          {user ? (
+            <>
+              <NavLink to="/dashboard">
+                <button className="text-white">Dashboard</button>
+              </NavLink>
+              <button
+              className="text-white"
+                onClick={() => {
+                  handleLogOut();
+                }}
+              >
+                LogOut
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login">
+                <button className="text-white">Login</button>
+              </NavLink>
+              <NavLink to="/register">
+                <button className="text-white">Register</button>
+              </NavLink>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button - Visible on small screens */}
@@ -66,9 +93,9 @@ const Navbar = () => {
       <div
         className={`${
           isOpen ? "block" : "hidden"
-        } absolute top-16 right-0 bg-gray-800 w-48 p-4 md:hidden`}
+        } absolute top-16 right-0 bg-black bg-opacity-35 w-28 p-4 md:hidden`}
       >
-        <div>
+        <div className="flex flex-col">
           <NavLink to="/">
             <button className="text-white">Home</button>
           </NavLink>

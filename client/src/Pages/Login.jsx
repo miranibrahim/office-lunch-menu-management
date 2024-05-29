@@ -1,41 +1,45 @@
-import { useContext } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import { AuthContext } from "../Providers/AuthProvider";
 import "./home.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useContext(AuthContext);
-  const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/";
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
     console.log(email, password);
 
-    signIn(email, password)
-      .then((result) => {
+    try {
+      const result = await signIn(email, password);
+      if (result.user) {
         console.log(result.user);
-        e.target.reset();
-        Swal.fire("Log in successful", "Press ok to Continue", "success");
-        navigate(from, { replace: true });
-      })
-      .catch((error) => {
-        console.log(error);
         Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `${error.message}`,
+          position: "top-end",
+          icon: "success",
+          title: "Login successful!!",
+          showConfirmButton: false,
+          timer: 1500,
         });
-      });
+        // toast.success("Successfully toasted!");
+        e.target.reset();
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(`${error.message}`);
+    }
   };
   return (
     <>
-      {/* <Navbar /> */}
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="flex h-screen justify-center items-center bg-base-200">
         <div className="w-full max-w-md p-16 rounded-lg border border-green-600">
           <form onSubmit={handleLogin}>
@@ -54,14 +58,20 @@ const Login = () => {
               />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-6 relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password *"
                 className="w-full border border-gray-600 rounded-md px-4 py-2"
                 required
               />
+              <span
+                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
             <button
               type="submit"
