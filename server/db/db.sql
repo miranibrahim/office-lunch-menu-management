@@ -57,3 +57,14 @@ SELECT date, menu
       FROM menu
       WHERE date BETWEEN $1 AND $2
       ORDER BY date;
+
+
+
+
+-- ---------- create order table ----------
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    choice TEXT[] NOT NULL,
+    date DATE NOT NULL
+);
