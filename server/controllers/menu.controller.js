@@ -1,9 +1,10 @@
 const pool = require("../db/db");
 
-exports.getAllMenu = async (req, res) => {
+exports.getSingleMenu = async (req, res) => {
+  const date = req.params.date;
   try {
-    const result = await pool.query("SELECT * FROM menus");
-    res.status(200).json({ message: "Menu returned.", data: result.rows });
+    const result = await pool.query("SELECT * FROM menus WHERE date = $1", [date]);
+    res.status(200).json({ message: "Menu returned.", data: result.rows[0] });
   } catch (error) {
     console.error("Error retrieving menu:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -75,7 +76,7 @@ exports.deleteMenu = async (req, res) => {
   try {
     const result = await pool.query(`DELETE FROM menus WHERE date=$1 `, [date]);
     console.log(result);
-    
+
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Menu not found." });
     }
