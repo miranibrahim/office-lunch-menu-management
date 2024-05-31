@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosPublic = axios.create({
-//   baseURL: "https://tech-book-server-iota.vercel.app",
   baseURL: "http://localhost:5000",
+  // baseURL: "https://server-eta-lake.vercel.app",
 });
 
 const useAxiosPublic = () => {
