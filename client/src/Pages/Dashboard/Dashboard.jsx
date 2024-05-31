@@ -1,23 +1,33 @@
 import { useContext, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  FaBoxOpen,
+  FaClipboard,
+  FaEdit,
+  FaHistory,
   FaHome,
   FaSignOutAlt,
-  FaUser,
   FaUsers,
 } from "react-icons/fa";
+import { MdOutlineRestaurantMenu } from "react-icons/md";
+import { MdNoteAdd } from "react-icons/md";
 import { FiMenu } from "react-icons/fi";
-import { FaFolderPlus } from "react-icons/fa6";
-import { IoStatsChart } from "react-icons/io5";
-import { RiCoupon3Line } from "react-icons/ri";
+
 import { AuthContext } from "../../Providers/AuthProvider";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const Dashboard = () => {
-  const role = "subscribed";
-  const { logOut } = useContext(AuthContext);
-  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [role, setRole] = useState(false);
+  const { user, logOut } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const axiosPublic = useAxiosPublic();
+  axiosPublic.get(`/users/${user?.email}`).then((res) => {
+    const userRole = res.data.data[0].role;
+    console.log(userRole);
+    if (userRole === "admin") {
+      setRole(true);
+    }
+  });
 
   const handleLogOut = () => {
     logOut()
@@ -35,7 +45,6 @@ const Dashboard = () => {
     <div className="flex flex-col md:flex-row bg-base-300 min-h-screen">
       {/* Hamburger menu for small and medium devices */}
       <div className="flex md:hidden justify-between items-center p-4">
-        
         <button onClick={toggleSidebar} className="text-xl">
           <FiMenu />
         </button>
@@ -54,49 +63,48 @@ const Dashboard = () => {
             </button>
           </li>
           {/* User routes */}
-          {(role === "subscribed" || role === "unsubscribed") && (
+          {!role && (
             <>
               <li>
-                <NavLink to="/dashboard/userProfile" onClick={toggleSidebar}>
-                  <FaUser />
-                  My Profile
+                <NavLink to="/dashboard/todayMenu" onClick={toggleSidebar}>
+                  <MdOutlineRestaurantMenu />
+                  {/* eslint-disable-next-line react/no-unescaped-entities */}
+                  Today's Menu
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/dashboard/addProduct" onClick={toggleSidebar}>
-                  <FaFolderPlus />
-                  Add Product
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/dashboard/myProduct" onClick={toggleSidebar}>
-                  <FaBoxOpen />
-                  My Product
+                <NavLink to="/dashboard/previousOrders" onClick={toggleSidebar}>
+                  <FaHistory />
+                  Order History
                 </NavLink>
               </li>
             </>
           )}
 
           {/* Admin routes */}
-          {role === "admin" && (
+          {role && (
             <>
               <li>
-                <NavLink to="/dashboard/statistics" onClick={toggleSidebar}>
-                  <IoStatsChart />
-                  Statistics
+                <NavLink to="/dashboard/addMenu" onClick={toggleSidebar}>
+                  <MdNoteAdd />
+                  Add Menu
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/dashboard/manageUsers" onClick={toggleSidebar}>
+                <NavLink to="/dashboard/manageMenu" onClick={toggleSidebar}>
+                  <FaEdit />
+                  Manage Menu
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard/orders" onClick={toggleSidebar}>
+                  <FaClipboard />
+                  Orders
+                </NavLink>
+                {/* <NavLink to="/dashboard/manageUsers" onClick={toggleSidebar}>
                   <FaUsers />
                   Manage Users
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/dashboard/manageCoupons" onClick={toggleSidebar}>
-                  <RiCoupon3Line />
-                  Manage Coupons
-                </NavLink>
+                </NavLink> */}
               </li>
             </>
           )}
@@ -107,12 +115,6 @@ const Dashboard = () => {
             <NavLink to="/" onClick={toggleSidebar}>
               <FaHome />
               Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/products" onClick={toggleSidebar}>
-              <FiMenu />
-              All Products
             </NavLink>
           </li>
           <li>
@@ -131,7 +133,9 @@ const Dashboard = () => {
 
       {/* Main content */}
       <div className="flex-1 ml-0 md:ml-5 p-4">
+        Welcome to lunch time
         <Outlet />
+        
       </div>
     </div>
   );
